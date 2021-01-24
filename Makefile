@@ -23,7 +23,7 @@ venv:
 	fi
 
 unit_test:
-	cd src/ && py.test tests
+	cd src/ && py.test tests/unit/
 
 generate_doc:
 	plantuml docs/*puml && mv docs/*.png docs/generated/
