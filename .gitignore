@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+**/.idea/
+.vault_password
+envs/env
+envs/env.dev
+envs/env.test
+**/.\#*
+**/*~
+**/#*#
+.generated_password
