@@ -5,7 +5,7 @@ def handle_script_create(request: flask.request):
     pass
 
 
-def handle_script_retrive(request: flask.request):
+def handle_script_retrieve(request: flask.request):
     pass
 
 
