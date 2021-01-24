@@ -4,3 +4,5 @@ jedi
 yapf
 black
 autopep8
+pylint
+flake8
