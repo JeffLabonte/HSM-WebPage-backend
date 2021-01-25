@@ -1,6 +1,7 @@
 from flask import Flask, abort, request
 
 from controllers import script_controller
+from common.exceptions import InvalidPayloadException
 
 
 SCRIPT_CONTROLLER_MAPPING = {
@@ -18,6 +19,8 @@ def create_app():
     def scripts_endpoint():
         try:
             return SCRIPT_CONTROLLER_MAPPING[request.method](request)
+        except InvalidPayloadException:
+            abort(400)
         except KeyError:
             abort(405)
 
