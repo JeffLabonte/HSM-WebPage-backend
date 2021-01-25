@@ -1,15 +1,13 @@
 from flask import Flask, abort, request
 
-import controllers
-
-app = Flask(__name__)
+from controllers import script_controller
 
 
 SCRIPT_CONTROLLER_MAPPING = {
-    'GET': None,
-    'POST': controllers.handle_script_create,
-    'PUT': None,
-    'DELETE': None,
+    'GET': script_controller.handle_script_retrieve,
+    'POST': script_controller.handle_script_create,
+    'PUT': script_controller.handle_script_update,
+    'DELETE': script_controller.handle_script_delete,
 }
 
 
