@@ -1,0 +1,2 @@
+def InvalidPayload(Exception):
+    pass
