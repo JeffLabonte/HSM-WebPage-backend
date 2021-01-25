@@ -11,9 +11,17 @@ SCRIPT_CONTROLLER_MAPPING = {
 }
 
 
-@app.route('/api/v1/scripts', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
-def scripts_endpoint():
-    try:
-        return SCRIPT_CONTROLLER_MAPPING[request.method](request)
-    except KeyError:
-        abort(405)
+def create_app():
+    app = Flask(__name__)
+
+    @app.route('/api/v1/script', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'])
+    def scripts_endpoint():
+        try:
+            return SCRIPT_CONTROLLER_MAPPING[request.method](request)
+        except KeyError:
+            abort(405)
+
+    return app
+
+
+app = create_app()
