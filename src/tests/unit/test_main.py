@@ -1,21 +1,32 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 from flask import url_for
 
 
-@pytest.mark.parametrize('method', [
-    'get',
-    'put',
-    'post',
-    'delete',
-])
-def test_scripts_endpoint__should_return_200_and_call_function(method, client):
-    dict_key = method.upper
-    with patch.dict('main.SCRIPT_CONTROLLER_MAPPING', {dict_key: MagicMock}) as mocked_function:
-        res = getattr(client, method)('/api/v1/script')
-        assert mocked_function[dict_key].called
-        assert res.status_code == 200
+MOCKED_CONTROLLER_MAPPING = {
+    'GET': MagicMock,
+    'PUT': MagicMock,
+    'POST': MagicMock,
+    'DELETE': MagicMock,
+}
+
+
+@pytest.mark.usefixtures('live_server')
+class TestLiveTest():
+
+    @patch.dict('main.SCRIPT_CONTROLLER_MAPPING', MOCKED_CONTROLLER_MAPPING, clear=True)
+    @pytest.mark.parametrize('method, request_method', [
+        ('GET', requests.get,),
+        ('PUT', requests.put,),
+        ('POST', requests.post,),
+        ('DELETE', requests.delete,),
+    ])
+    def test_scripts_endpoint__should_calls_mock_function(self, method, request_method):
+        dict_key = method.upper()
+        res = request_method(url_for('scripts_endpoint', _external=True))
+        assert MOCKED_CONTROLLER_MAPPING[dict_key].called
 
 
 @pytest.mark.parametrize('method', [

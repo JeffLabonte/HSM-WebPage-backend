@@ -1,5 +1,4 @@
-from validator import validate_schema
-
+from common.validator import validate_schema
 from schemas.script import script_post_schema
 
 import pytest
