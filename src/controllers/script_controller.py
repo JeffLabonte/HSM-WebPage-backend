@@ -2,16 +2,16 @@ import flask
 
 
 def handle_script_create(request: flask.request):
-    pass
+    return ''
 
 
 def handle_script_retrieve(request: flask.request):
-    pass
+    return ''
 
 
 def handle_script_update(request: flask.request):
-    pass
+    return ''
 
 
 def handle_script_delete(request: flask.request):
-    pass
+    return ''
