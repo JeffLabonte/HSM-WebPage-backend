@@ -1,15 +1,21 @@
+import json
+import time
+from typing import Callable, Dict
+
 from pika import BlockingConnection, ConnectionParameters
 from pika.channel import Channel
 
 
 class AMQPService:
-    def __init__(self, calback, host="broker", port=5672, exchange="script_topic"):
+    def __init__(self, exchange, callback=None, host="broker", port=5672):
         self.connection = BlockingConnection(
             ConnectionParameters(host=host, port=port),
         )
         self.exchange = exchange
         self.channel = self._init_channel()
         self.queue_name = self._init_queue()
+        if callback and callable(callback):
+            self._add_callback(callback)
 
     def _init_channel(self) -> Channel:
         channel = self.connection.channel()
@@ -33,20 +39,24 @@ class AMQPService:
             auto_ack=True,
         )
 
-    async def wait_consume(self):
+    def wait_consume(self, timeout=20):
+        start_time = time.time()
         while True:
             method_frame, header_frame, body = self.channel.basic_get(
-                queue=self.queue_name, no_ack=False
+                queue=self.queue_name, auto_ack=False
             )
 
             if method_frame:
                 print(method_frame, header_frame, body)
-                channel.basic_ack(method_frame.delivery_tag)
+                self.channel.basic_ack(method_frame.delivery_tag)
                 return body
+
+            if time.time() - start_time >= timeout:
+                raise TimeoutError()
 
     def publish(self, topic: str, message: Dict):
         self.channel.basic_publish(
             exchange=self.exchange,
             routing_key=topic,
-            body=message,
+            body=json.dumps(message),
         )
