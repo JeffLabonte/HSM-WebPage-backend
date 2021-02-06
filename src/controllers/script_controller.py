@@ -1,4 +1,5 @@
 from typing import Callable, Dict
+from os import environ
 
 import flask
 
@@ -13,6 +14,15 @@ class ContextInjector:
 
     def __init__(self, fn: Callable):
         self.fn = fn
+        self._broker_host = self.environment(
+            variable='BROKER_HOST',
+            default='broker',
+        )
+
+    def environment(self, variable, default):
+        if value := environ.get(variable, None):
+            return value
+        return default
 
     @classmethod
     def get_context(cls):
