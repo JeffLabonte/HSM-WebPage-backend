@@ -9,26 +9,27 @@ from external_services.amqp import AMQPService
 from schemas.script import script_post_schema
 
 
+def environment(variable, default):
+    if value := environ.get(variable, None):
+        return value
+    return default
+
+
 class ContextInjector:
     _CONTEXT = {}
+    _BROKER_HOST = environment(variable='BROKER_HOST', default='broker')
 
     def __init__(self, fn: Callable):
         self.fn = fn
-        self._broker_host = self.environment(
-            variable='BROKER_HOST',
-            default='broker',
-        )
-
-    def environment(self, variable, default):
-        if value := environ.get(variable, None):
-            return value
-        return default
 
     @classmethod
     def get_context(cls):
         if not cls._CONTEXT:
             cls._CONTEXT = {
-                'create_amqp_service': AMQPService(exchange='script_topic'),
+                'create_amqp_service': AMQPService(
+                    exchange='script_topic',
+                    host=cls._BROKER_HOST,
+                ),
             }
         return cls._CONTEXT
 
