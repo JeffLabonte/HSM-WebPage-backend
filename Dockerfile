@@ -1,6 +1,8 @@
 FROM python:3.9-buster
 LABEL maintainer="Jeff Labonte <grimsleepless@protonmail.com>"
 
+env BROKER_HOST="broker"
+
 WORKDIR /opt
 
 COPY docker-entrypoint.sh /opt/
