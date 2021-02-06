@@ -23,6 +23,8 @@ def create_app():
             abort(400)
         except KeyError:
             abort(405)
+        except TimeoutError:
+            abort(500)
 
     return app
 
