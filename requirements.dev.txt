@@ -6,3 +6,4 @@ black
 autopep8
 pylint
 flake8
+jupyter
