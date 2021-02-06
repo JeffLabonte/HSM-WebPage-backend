@@ -8,25 +8,26 @@ from external_services.amqp import AMQPService
 from schemas.script import script_post_schema
 
 
-class ContextManager:
+class ContextInjector:
+    _CONTEXT = {}
 
     def __init__(self, fn: Callable):
         self.fn = fn
 
     @classmethod
     def get_context(cls):
-        if cls.context:
-            return cls.context
-        cls.context = {
-            'create_amqp_service': AMQPService(exchange='script_topic'),
-        }
+        if not cls._CONTEXT:
+            cls._CONTEXT = {
+                'create_amqp_service': AMQPService(exchange='script_topic'),
+            }
+        return cls._CONTEXT
 
     def __call__(self, *args, **kwargs):
         kwargs['context'] = self.get_context()
         return self.fn(*args, **kwargs)
 
 
-@ContextManager
+@ContextInjector
 def handle_script_create(request: flask.request, context: Dict):
     payload = request.json
     amqp_service = context['create_amqp_service']
@@ -38,15 +39,16 @@ def handle_script_create(request: flask.request, context: Dict):
     return amqp_service.wait_consume()
 
 
-@ContextManager
+@ContextInjector
 def handle_script_retrieve(request: flask.request, context):
     return ''
 
 
-@ContextManager
+@ContextInjector
 def handle_script_update(request: flask.request, context):
     return ''
 
 
+@ContextInjector
 def handle_script_delete(request: flask.request, context):
     return ''
