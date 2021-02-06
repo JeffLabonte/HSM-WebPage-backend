@@ -1,3 +1,5 @@
+from typing import Callable, Dict
+
 import flask
 
 from common.exceptions import InvalidPayloadException
@@ -5,25 +7,46 @@ from common.validator import validate_schema
 from external_services.amqp import AMQPService
 from schemas.script import script_post_schema
 
-CREATE_AMQP_SERVICE = AMQPService(exchange='script_topic')
+
+class ContextManager:
+
+    def __init__(self, fn: Callable):
+        self.fn = fn
+
+    @classmethod
+    def get_context(cls):
+        if cls.context:
+            return cls.context
+        cls.context = {
+            'create_amqp_service': AMQPService(exchange='script_topic'),
+        }
+
+    def __call__(self, *args, **kwargs):
+        kwargs['context'] = self.get_context()
+        return self.fn(*args, **kwargs)
 
 
-def handle_script_create(request: flask.request):
+@ContextManager
+def handle_script_create(request: flask.request, context: Dict):
     payload = request.json
+    amqp_service = context['create_amqp_service']
+
     if errors := validate_schema(payload, script_post_schema):
         raise InvalidPayloadException(f'Errors: {errors}')
 
-    CREATE_AMQP_SERVICE.publish(topic='script.create', message=payload)
-    return CREATE_AMQP_SERVICE.wait_consume()
+    amqp_service.publish(topic='script.create', message=payload)
+    return amqp_service.wait_consume()
 
 
-def handle_script_retrieve(request: flask.request):
+@ContextManager
+def handle_script_retrieve(request: flask.request, context):
     return ''
 
 
-def handle_script_update(request: flask.request):
+@ContextManager
+def handle_script_update(request: flask.request, context):
     return ''
 
 
-def handle_script_delete(request: flask.request):
+def handle_script_delete(request: flask.request, context):
     return ''
