@@ -1,4 +1,4 @@
-from flask import Flask, abort, request
+from flask import Flask, abort, request, jsonify
 
 from controllers import script_controller
 from common.exceptions import InvalidPayloadException
@@ -18,7 +18,7 @@ def create_app():
     @app.route('/api/v1/script', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'])
     def scripts_endpoint():
         try:
-            return SCRIPT_CONTROLLER_MAPPING[request.method](request)
+            return jsonify(SCRIPT_CONTROLLER_MAPPING[request.method](request))
         except InvalidPayloadException:
             abort(400)
         except KeyError:

@@ -60,7 +60,8 @@ class AMQPService:
             if method_frame:
                 print(method_frame, header_frame, body)
                 self.channel.basic_ack(method_frame.delivery_tag)
-                return json.dumps(body)
+
+                return json.loads(body.decode('utf-8'))
 
             if time.time() - start_time >= timeout:
                 raise TimeoutError()
