@@ -29,6 +29,7 @@ class ContextInjector:
                 'create_amqp_service': AMQPService(
                     exchange='script_topic',
                     host=cls._BROKER_HOST,
+                    routing_keys=['script.create.#'],
                 ),
             }
         return cls._CONTEXT
