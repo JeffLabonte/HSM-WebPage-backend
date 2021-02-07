@@ -1,19 +1,21 @@
 import json
 import time
-from typing import Callable, Dict
+from typing import Callable, Dict, List
 
 from pika import BlockingConnection, ConnectionParameters
 from pika.channel import Channel
 
 
 class AMQPService:
-    def __init__(self, exchange, callback=None, host="broker", port=5672):
+    def __init__(self, exchange: str, routing_keys: List, callback=None, host="broker", port=5672):
         self.connection = BlockingConnection(
             ConnectionParameters(host=host, port=port),
         )
         self.exchange = exchange
         self.channel = self._init_channel()
         self.queue_name = self._init_queue()
+        self.bind_routing_keys(routing_keys=routing_keys)
+
         if callback and callable(callback):
             self._add_callback(callback)
 
@@ -28,6 +30,14 @@ class AMQPService:
     def _init_queue(self) -> str:
         result = self.channel.queue_declare('', exclusive=True)
         return result.method.queue
+
+    def bind_routing_keys(self, routing_keys: List):
+        for routing_key in routing_keys:
+            self.channel.queue_bind(
+                exchange=self.exchange,
+                queue=self.queue_name,
+                routing_key=routing_key,
+            )
 
     def _add_callback(self, callback: Callable) -> None:
         if not callable(callback):
