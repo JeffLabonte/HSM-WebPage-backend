@@ -49,8 +49,9 @@ class AMQPService:
             auto_ack=True,
         )
 
-    def wait_consume(self, timeout=20):
+    def wait_consume(self, timeout: int = 20) -> str:
         start_time = time.time()
+
         while True:
             method_frame, header_frame, body = self.channel.basic_get(
                 queue=self.queue_name, auto_ack=False
@@ -59,10 +60,12 @@ class AMQPService:
             if method_frame:
                 print(method_frame, header_frame, body)
                 self.channel.basic_ack(method_frame.delivery_tag)
-                return body
+                return json.dumps(body)
 
             if time.time() - start_time >= timeout:
                 raise TimeoutError()
+
+            time.sleep(0.1)
 
     def publish(self, topic: str, message: Dict):
         self.channel.basic_publish(
