@@ -1,12 +1,13 @@
-from typing import Callable, Dict
+import json
 from os import environ
-
-import flask
+from typing import Callable, Dict
 
 from common.exceptions import InvalidPayloadException
 from common.validator import validate_schema
 from external_services.amqp import AMQPService
 from schemas.script import script_post_schema
+
+import flask
 
 
 def environment(variable, default):
