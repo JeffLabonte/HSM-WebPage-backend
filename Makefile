@@ -22,6 +22,9 @@ venv:
 		echo "[-] venv already exists";\
 	fi
 
+start_dev:
+	BROKER_HOST=localhost bash docker-entrypoint.sh
+
 unit_test:
 	cd src/ && py.test tests/unit/
 
