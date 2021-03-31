@@ -2,6 +2,8 @@ from uuid import uuid4
 
 from rest_framework import serializers
 
+from backend.scripts.models import ScriptQueryAudit
+
 REPO_URL_REGEX = r"^(git@github.com:)[A-Za-z0-9-_.]+/[A-Za-z0-9-_.]+.git$"
 
 
